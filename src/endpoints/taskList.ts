@@ -1,66 +1,71 @@
-import {
-	OpenAPIRoute,
-	OpenAPIRouteSchema,
-	Query,
-} from "@cloudflare/itty-router-openapi";
+import { OpenAPIRoute, OpenAPIRouteSchema, Query } from "@cloudflare/itty-router-openapi";
 import { Task } from "../types";
 
 export class TaskList extends OpenAPIRoute {
-	static schema: OpenAPIRouteSchema = {
-		tags: ["Tasks"],
-		summary: "List Tasks",
-		parameters: {
-			page: Query(Number, {
-				description: "Page number",
-				default: 0,
-			}),
-			isCompleted: Query(Boolean, {
-				description: "Filter by completed flag",
-				required: false,
-			}),
-		},
-		responses: {
-			"200": {
-				description: "Returns a list of tasks",
-				schema: {
-					success: Boolean,
-					result: {
-						tasks: [Task],
-					},
-				},
-			},
-		},
-	};
+  static schema: OpenAPIRouteSchema = {
+    tags: ["Tasks"],
+    summary: "List Tasks",
+    parameters: {
+      page: Query(Number, {
+        description: "Page number",
+        default: 0,
+        required: true
+      }),
+      limit: Query(Number, {
+        description: "Limit number",
+        default: 0,
+        required: true
+      }),
+    },
+    responses: {
+      "200": {
+        description: "Returns a list of tasks",
+        schema: {
+          success: Boolean,
+          result: {
+            tasks: [Task],
+          },
+        },
+      },
+    },
+  };
 
-	async handle(
-		request: Request,
-		env: any,
-		context: any,
-		data: Record<string, any>
-	) {
-		// Retrieve the validated parameters
-		const { page, isCompleted } = data.query;
+  async handle(request: Request, env: any, context: any, data: Record<string, any>) {
+    const { page, limit } = data.query;
 
-		// Implement your own object list here
+    if (Number.isNaN(page) || page < 0) {
+      return {
+        success: false,
+        error: "Invalid page number",
+      };
+    }
 
-		return {
-			success: true,
-			tasks: [
-				{
-					name: "Clean my room",
-					slug: "clean-room",
-					description: null,
-					completed: false,
-					due_date: "2025-01-05",
-				},
-				{
-					name: "Build something awesome with Cloudflare Workers",
-					slug: "cloudflare-workers",
-					description: "Lorem Ipsum",
-					completed: true,
-					due_date: "2022-12-24",
-				},
-			],
-		};
-	}
+    if (Number.isNaN(limit) || limit < 0) {
+      return {
+        success: false,
+        error: "Invalid limit",
+      };
+    }
+
+    console.log(`
+    SELECT *
+    FROM tasks
+    ORDER BY created_at
+    LIMIT ${limit}
+    OFFSET ${Number(page) * Number(limit)}
+    `)
+
+    const {results} = await env.DB.prepare(`
+    SELECT *
+    FROM tasks
+    ORDER BY created_at
+    LIMIT ${limit}
+    OFFSET ${Number(page) * Number(limit)}
+    `).all();
+
+    return {
+      success: true,
+      tasks: results,
+    };
+  }
 }

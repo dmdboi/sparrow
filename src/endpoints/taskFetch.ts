@@ -8,10 +8,10 @@ import { Task } from "../types";
 export class TaskFetch extends OpenAPIRoute {
 	static schema: OpenAPIRouteSchema = {
 		tags: ["Tasks"],
-		summary: "Get a single Task by slug",
+		summary: "Get a single Task by ID",
 		parameters: {
-			taskSlug: Path(String, {
-				description: "Task slug",
+			taskId: Path(Number, {
+				description: "Task ID",
 			}),
 		},
 		responses: {
@@ -41,9 +41,10 @@ export class TaskFetch extends OpenAPIRoute {
 		data: Record<string, any>
 	) {
 		// Retrieve the validated slug
-		const { taskSlug } = data.params;
+		const { taskId } = data.params;
 
 		// Implement your own object fetch here
+		const { results } = await env.DB.prepare(`SELECT * FROM tasks WHERE id = ?`).bind(taskId).all();
 
 		const exists = true;
 
@@ -62,13 +63,7 @@ export class TaskFetch extends OpenAPIRoute {
 
 		return {
 			success: true,
-			task: {
-				name: "my task",
-				slug: taskSlug,
-				description: "this needs to be done",
-				completed: false,
-				due_date: new Date().toISOString().slice(0, 10),
-			},
+			task: results,
 		};
 	}
 }

@@ -1,5 +1,5 @@
 {
-	"name": "cloudflare-workers-openapi",
+	"name": "sparrow-api",
 	"version": "0.0.1",
 	"private": true,
 	"scripts": {
@@ -8,7 +8,8 @@
 		"start": "wrangler dev"
 	},
 	"dependencies": {
-		"@cloudflare/itty-router-openapi": "^1.0.1"
+		"@cloudflare/itty-router-openapi": "^1.0.1",
+		"slugify": "^1.6.6"
 	},
 	"devDependencies": {
 		"@cloudflare/workers-types": "^4.20240403.0",
