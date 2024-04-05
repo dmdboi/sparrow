@@ -20,15 +20,23 @@ export class TaskCreate extends OpenAPIRoute {
   };
 
   async handle(request: Request, env: any, context: any, data: Record<string, any>) {
+    const AUTH_TOKEN = env.AUTH_TOKEN;
+    const authHeader = request.headers.get("Authorization");
+
+    if (!authHeader || authHeader !== `Bearer ${AUTH_TOKEN}`) {
+      return {
+        success: false,
+        error: "Unauthorized",
+      };
+    }
+
     // Retrieve the validated request body
     const taskToCreate = data.body;
 
     // Implement your own object insertion here
-    await env.DB.prepare(`INSERT INTO tasks (name, tag, created_at) VALUES (?, ?, ?)`).bind(
-      taskToCreate.name,
-      taskToCreate.tag ? taskToCreate.tag : "Default",
-      new Date().valueOf()
-    ).run();
+    await env.DB.prepare(`INSERT INTO tasks (name, tag, created_at) VALUES (?, ?, ?)`)
+      .bind(taskToCreate.name, taskToCreate.tag ? taskToCreate.tag : "Default", new Date().valueOf())
+      .run();
 
     // return the new task
     return {

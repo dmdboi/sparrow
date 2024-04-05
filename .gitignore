@@ -173,3 +173,6 @@ dist
 .wrangler
 
 wrangler.toml
+wrangler.toml
+
+.vscode

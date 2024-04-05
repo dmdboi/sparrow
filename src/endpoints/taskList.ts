@@ -9,12 +9,12 @@ export class TaskList extends OpenAPIRoute {
       page: Query(Number, {
         description: "Page number",
         default: 0,
-        required: true
+        required: true,
       }),
       limit: Query(Number, {
         description: "Limit number",
         default: 0,
-        required: true
+        required: true,
       }),
     },
     responses: {
@@ -31,6 +31,16 @@ export class TaskList extends OpenAPIRoute {
   };
 
   async handle(request: Request, env: any, context: any, data: Record<string, any>) {
+    const AUTH_TOKEN = env.AUTH_TOKEN;
+    const authHeader = request.headers.get("Authorization");
+
+    if (!authHeader || authHeader !== `Bearer ${AUTH_TOKEN}`) {
+      return {
+        success: false,
+        error: "Unauthorized",
+      };
+    }
+
     const { page, limit } = data.query;
 
     if (Number.isNaN(page) || page < 0) {
@@ -53,15 +63,17 @@ export class TaskList extends OpenAPIRoute {
     ORDER BY created_at
     LIMIT ${limit}
     OFFSET ${Number(page) * Number(limit)}
-    `)
+    `);
 
-    const {results} = await env.DB.prepare(`
+    const { results } = await env.DB.prepare(
+      `
     SELECT *
     FROM tasks
     ORDER BY created_at
     LIMIT ${limit}
     OFFSET ${Number(page) * Number(limit)}
-    `).all();
+    `
+    ).all();
 
     return {
       success: true,

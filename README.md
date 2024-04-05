@@ -1,9 +1,6 @@
-# Cloudflare Workers OpenAPI 3.1
+# Sparrow API
 
-This is a Cloudflare Worker with OpenAPI 3.1 using [itty-router-openapi](https://github.com/cloudflare/itty-router-openapi).
-
-This is an example project made to be used as a quick start into building OpenAPI compliant Workers that generates the
-`openapi.json` schema automatically from code and validates the incoming request to the defined parameters or request body.
+This is the API behind [sparrow-cli](https://github.com/dmdboi/sparrow-cli) which lets you track daily completed tasks/goals in a D1 database.
 
 ## Get started
 
@@ -16,10 +13,18 @@ This is an example project made to be used as a quick start into building OpenAP
 
 1. Your main router is defined in `src/index.ts`.
 2. Each endpoint has its own file in `src/endpoints/`.
-3. For more information read the [itty-router-openapi official documentation](https://cloudflare.github.io/itty-router-openapi/).
 
 ## Development
 
 1. Run `wrangler dev` to start a local instance of the API.
 2. Open `http://localhost:9000/` in your browser to see the Swagger interface where you can try the endpoints.
 3. Changes made in the `src/` folder will automatically trigger the server to reload, you only need to refresh the Swagger interface.
+
+## Authentication
+
+To add authentication to your project, simply generate a random token and add it to your wrangler.toml file like so 
+
+```
+[vars]
+AUTH_TOKEN = "test-xxx"
+```
