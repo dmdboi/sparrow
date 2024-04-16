@@ -16,6 +16,11 @@ export class TaskList extends OpenAPIRoute {
         default: 0,
         required: true,
       }),
+      order: Query(String, {
+        description: "Order direction",
+        default: "ASC",
+        required: true,
+      }),
     },
     responses: {
       "200": {
@@ -41,7 +46,7 @@ export class TaskList extends OpenAPIRoute {
       };
     }
 
-    const { page, limit } = data.query;
+    const { page, limit, order } = data.query;
 
     if (Number.isNaN(page) || page < 0) {
       return {
@@ -60,7 +65,7 @@ export class TaskList extends OpenAPIRoute {
     console.log(`
     SELECT *
     FROM tasks
-    ORDER BY created_at
+    ORDER BY created_at ${order}
     LIMIT ${limit}
     OFFSET ${Number(page) * Number(limit)}
     `);
@@ -69,7 +74,7 @@ export class TaskList extends OpenAPIRoute {
       `
     SELECT *
     FROM tasks
-    ORDER BY created_at
+    ORDER BY created_at ${order}
     LIMIT ${limit}
     OFFSET ${Number(page) * Number(limit)}
     `

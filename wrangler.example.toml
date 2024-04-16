@@ -6,3 +6,10 @@ compatibility_date = "2024-04-03"
 binding = "DB"
 database_name = "sparrow"
 database_id = ""
+
+[vars]
+AUTH_TOKEN = ""
+DISCORD_WEBHOOK = "https://discord.com/api/webhooks/"
+
+[triggers]
+crons = ["0 1 * * *"]
